@@ -12,6 +12,9 @@
 	],
 	"observability": {
 		"enabled": true
+	},
+	"assets": {
+		"directory": "./public/"
 	}
 	/**
 	 * Smart Placement
@@ -35,7 +38,7 @@
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
 	 */
-	// "assets": {  "directory": "./public/",  "binding": "ASSETS" }
+	// Static files in ./public/ are served before unmatched requests reach the Worker.
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
