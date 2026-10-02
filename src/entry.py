@@ -1,10 +1,11 @@
 import json
 import logging
+from collections.abc import Mapping
 from urllib.parse import urlparse
 
 from workers import Response, WorkerEntrypoint
 
-from fraud_rules import derive_signals
+from fraud_rules import derive_signals, has_assessable_data
 
 MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 logger = logging.getLogger(__name__)
@@ -49,7 +50,35 @@ class Default(WorkerEntrypoint):
                     status=400,
                 )
 
+            if not isinstance(event, Mapping):
+                return Response.json(
+                    {"error": "Request body must be a JSON object"},
+                    status=400,
+                )
+
             event_details = event.get("event", event)
+            if not isinstance(event_details, Mapping):
+                return Response.json(
+                    {"error": "The event field must be a JSON object"},
+                    status=400,
+                )
+
+            if not has_assessable_data(event_details):
+                return Response.json(
+                    {
+                        "risk": "indeterminate",
+                        "summary": (
+                            "No signals that could meaningfully ascertain risk "
+                            "were provided."
+                        ),
+                        "signals": [],
+                        "recommended_actions": [
+                            "Provide at least one complete country comparison or "
+                            "a numeric activity count, then submit the event again."
+                        ],
+                    }
+                )
+
             local_signals = derive_signals(event_details)
 
             try:

@@ -30,6 +30,11 @@ context, assign a `low`, `medium`, or `high` risk level, summarize the incident,
 and recommend investigation or mitigation steps. It is instructed not to claim
 that fraud has definitively occurred or invent unsupported facts.
 
+If the event does not contain a complete country comparison or either numeric
+activity count, the AI layer is skipped and the application returns an
+`indeterminate` risk result explaining that there is not enough information to
+meaningfully assess risk.
+
 ## Architecture
 
 ```text
@@ -67,6 +72,12 @@ as shown below, or submitted directly as the top-level object. The top-level
 Additional fields are allowed and are passed to the AI assessment as context.
 For the most useful result, include `country` plus every field relevant to the
 event, even when its value does not cross a deterministic threshold.
+
+An event is considered assessable when it contains at least one of the following:
+
+- `country` together with `ip_country` or `card_country`.
+- A numeric `prior_accounts_from_ip` value.
+- A numeric `payment_attempts_last_hour` value.
 
 ## Example
 

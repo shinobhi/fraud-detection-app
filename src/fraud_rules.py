@@ -2,6 +2,19 @@ from collections.abc import Mapping
 from typing import Any
 
 
+def has_assessable_data(event: Mapping[str, Any]) -> bool:
+    """Return whether the event contains data that can meaningfully assess risk."""
+    account_country = event.get("country")
+    has_country_comparison = bool(account_country) and bool(
+        event.get("ip_country") or event.get("card_country")
+    )
+    has_activity_count = _is_number(event.get("prior_accounts_from_ip")) or _is_number(
+        event.get("payment_attempts_last_hour")
+    )
+
+    return has_country_comparison or has_activity_count
+
+
 def derive_signals(event: Mapping[str, Any]) -> list[str]:
     """Derive deterministic fraud signals from an event payload."""
     signals: list[str] = []

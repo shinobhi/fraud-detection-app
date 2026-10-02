@@ -1,6 +1,6 @@
 import unittest
 
-from src.fraud_rules import derive_signals
+from src.fraud_rules import derive_signals, has_assessable_data
 
 
 class DeriveSignalsTests(unittest.TestCase):
@@ -31,6 +31,19 @@ class DeriveSignalsTests(unittest.TestCase):
         )
 
         self.assertEqual(signals, [])
+
+    def test_irrelevant_fields_are_not_assessable(self):
+        self.assertFalse(
+            has_assessable_data(
+                {"email": "jsmith@example.com", "promo_code": "FREE30"}
+            )
+        )
+
+    def test_country_pair_is_assessable(self):
+        self.assertTrue(has_assessable_data({"country": "US", "ip_country": "US"}))
+
+    def test_numeric_activity_count_is_assessable(self):
+        self.assertTrue(has_assessable_data({"prior_accounts_from_ip": 0}))
 
 
 if __name__ == "__main__":

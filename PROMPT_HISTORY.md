@@ -102,3 +102,7 @@
 > - An overview of the purpose of the application, as well as its overall architecture and functioning. (Talk about the signals we use, as well our deterministic vs. non-deterministic layers of evaluation.)
 > - An example input and expected output. We can simply use the default input that the user is confronted with when they first open the application.
 > - A link to the application ([https://fraud-detection-app.cilindra.workers.dev/](https://fraud-detection-app.cilindra.workers.dev/))
+
+## Prompt 15
+
+> We need one more change. If no "relevant" fields are provided in the input, this should be called out in the response. Instead of returning "low", "medium", or "high" risk, we should return a response with a risk value of "indeterminate" and a summary that states that no signals that could meaningfully ascertain risk one way or another were provided.
