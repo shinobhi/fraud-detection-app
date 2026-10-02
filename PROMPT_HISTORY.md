@@ -70,3 +70,35 @@
 ## Prompt 10
 
 > That makes sense, and thank you for the correction. Can we add some code to handle these errors and notify the end user?
+
+## Prompt 11
+
+> Let's talk deployment. What steps do I need to take to make this a live application?
+
+## Prompt 12
+
+> That makes sense. Can you help me implement these necessary authentication measures?
+
+## Prompt 13
+
+> No, fraud-detection-app is not yet deployed to my Cloudflare account. I don't have any particular limits I want to enforce for this application.
+
+## Prompt 14
+
+> # Context from my IDE setup:
+>
+> ## Active file: README.md
+>
+> ## Open tabs:
+> - README.md: README.md
+> - entry.py: src/entry.py
+> - AGENTS.md: AGENTS.md
+> - app.js: public/app.js
+> - fraud_rules.py: src/fraud_rules.py
+>
+> ## My request for Codex:
+> These are some of the finer points, but let's add them now. Help me streamline the README.md of this repository. We want to include the following:
+>
+> - An overview of the purpose of the application, as well as its overall architecture and functioning. (Talk about the signals we use, as well our deterministic vs. non-deterministic layers of evaluation.)
+> - An example input and expected output. We can simply use the default input that the user is confronted with when they first open the application.
+> - A link to the application ([https://fraud-detection-app.cilindra.workers.dev/](https://fraud-detection-app.cilindra.workers.dev/))
