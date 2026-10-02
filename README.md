@@ -47,6 +47,27 @@ Python Worker (src/entry.py)
 JSON response
 ```
 
+## Input fields
+
+The endpoint requires a valid JSON object, but it does not currently require any
+individual event field. The event data may be placed inside an `event` object,
+as shown below, or submitted directly as the top-level object. The top-level
+`message` field is optional and is not used by the deterministic rules.
+
+| Field | Required? | How it is used |
+| --- | --- | --- |
+| `country` | Conditional | Provides the account country used by both country-mismatch rules. Without it, neither mismatch can be evaluated. |
+| `ip_country` | Optional | Compared with `country` when both fields are present. |
+| `card_country` | Optional | Compared with `country` when both fields are present. |
+| `prior_accounts_from_ip` | Optional | Produces a signal when it is numeric and greater than `4`. |
+| `payment_attempts_last_hour` | Optional | Produces a signal when it is numeric and greater than `4`. |
+| `email` | Optional | Available to the AI assessment as context; it is not used by a deterministic rule. |
+| `promo_code` | Optional | Available to the AI assessment as context; it is not used by a deterministic rule. |
+
+Additional fields are allowed and are passed to the AI assessment as context.
+For the most useful result, include `country` plus every field relevant to the
+event, even when its value does not cross a deterministic threshold.
+
 ## Example
 
 The application opens with this event:
