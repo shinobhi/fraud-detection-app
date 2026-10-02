@@ -2,6 +2,8 @@ from workers import Response, WorkerEntrypoint
 from urllib.parse import urlparse
 import json
 
+from fraud_rules import derive_signals
+
 MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 
 FRAUD_RESPONSE_SCHEMA = {
@@ -44,6 +46,9 @@ class Default(WorkerEntrypoint):
                     status=400,
                 )
 
+            event_details = event.get("event", event)
+            local_signals = derive_signals(event_details)
+
             result = await self.env.AI.run(
                 MODEL,
                 {
@@ -52,12 +57,13 @@ class Default(WorkerEntrypoint):
                             "role": "system",
                             "content": (
                                 "You are a fraud investigation assistant. "
-                                "Analyze account and payment events for suspicious signals. "
-                                "Do not claim fraud has definitely occurred. "
-                                "Base the risk rating only on evidence in the supplied event. "
-                                "Return every field required by the response schema. "
-                                "Keep the summary concise, list each signal separately, and "
-                                "recommend concrete investigation or mitigation actions."
+                                "The application has already computed deterministic fraud signals. "
+                                "Use those signals as evidence when explaining risk and include "
+                                "each one verbatim in the response's signals array. "
+                                "Do not invent additional factual signals that are not supported by the event. "
+                                "You may identify patterns worth investigating, but clearly distinguish them "
+                                "from signals already detected by the system. "
+                                "Do not state that fraud has definitely occurred."
                             ),
                         },
                         {
@@ -65,6 +71,8 @@ class Default(WorkerEntrypoint):
                             "content": (
                                 "Analyze this event:\n\n"
                                 + json.dumps(event, indent=2)
+                                + "\n\nDeterministic fraud signals:\n"
+                                + json.dumps(local_signals, indent=2)
                             ),
                         },
                     ],

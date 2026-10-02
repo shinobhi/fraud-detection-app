@@ -16,7 +16,13 @@ form.addEventListener('submit', async (event) => {
   }
 
   button.disabled = true;
-  result.textContent = 'Analyzing...';
+  const analyzingFrames = ['Analyzing.', 'Analyzing..', 'Analyzing...'];
+  let analyzingFrame = 0;
+  result.textContent = analyzingFrames[analyzingFrame];
+  const analyzingAnimation = setInterval(() => {
+    analyzingFrame = (analyzingFrame + 1) % analyzingFrames.length;
+    result.textContent = analyzingFrames[analyzingFrame];
+  }, 400);
 
   try {
     const response = await fetch('/analyze', {
@@ -29,6 +35,7 @@ form.addEventListener('submit', async (event) => {
   } catch (error) {
     result.textContent = `Request failed: ${error.message}`;
   } finally {
+    clearInterval(analyzingAnimation);
     button.disabled = false;
   }
 });

@@ -46,3 +46,19 @@
 > signals: An array of strings listing which signals led us to believe this is fraud.
 >
 > recommended_actions: An array of strings containing recommended actions to take to resolve this fraud incident.
+
+## Prompt 7
+
+> Let's also streamline this a bit by including some "local" signals that we can use to ascertain fraud in our file src/fraud_rules.py. Our function derive_signals() should take the JSON event as an input and output a list of signals as a list of "strings" in Python. I would like to enforce the following:
+>
+> If the ip_country != account country (field "country"), then append a string stating this mismatch to the signal list that we return.
+>
+> If the card_country != account country (field "country"), then append a string stating this mismatch to the signal list that we return.
+>
+> If the number of prior accounts associated with the same IP is greater than 4, add this to the list of signals to return.
+>
+> If the number of purchase attempts from this card is greater than 4, add this to the list of signals to return.
+
+## Prompt 8
+
+> When we are waiting for a response for the user, I would like to replace the simple "Analyzing..." text with a pseudo-animation. Can you replace it with a changing text that cycles between "Analyzing." "Analyzing.." and "Analyzing..." ?
