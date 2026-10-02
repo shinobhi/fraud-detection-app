@@ -62,3 +62,11 @@
 ## Prompt 8
 
 > When we are waiting for a response for the user, I would like to replace the simple "Analyzing..." text with a pseudo-animation. Can you replace it with a changing text that cycles between "Analyzing." "Analyzing.." and "Analyzing..." ?
+
+## Prompt 9
+
+> Let's talk 404 errors. How are we currently handling a situation where the agent is unreachable for whatever reason?
+
+## Prompt 10
+
+> That makes sense, and thank you for the correction. Can we add some code to handle these errors and notify the end user?

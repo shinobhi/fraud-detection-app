@@ -30,7 +30,22 @@ form.addEventListener('submit', async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body,
     });
-    const data = await response.json();
+
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json')
+      ? await response.json()
+      : null;
+
+    if (!response.ok) {
+      result.textContent = data?.error
+        || `Analysis failed with status ${response.status}. Please try again.`;
+      return;
+    }
+
+    if (!data) {
+      throw new Error('The analysis service returned an unexpected response.');
+    }
+
     result.textContent = JSON.stringify(data, null, 2);
   } catch (error) {
     result.textContent = `Request failed: ${error.message}`;

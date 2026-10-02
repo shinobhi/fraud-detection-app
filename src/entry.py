@@ -1,10 +1,13 @@
-from workers import Response, WorkerEntrypoint
-from urllib.parse import urlparse
 import json
+import logging
+from urllib.parse import urlparse
+
+from workers import Response, WorkerEntrypoint
 
 from fraud_rules import derive_signals
 
 MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+logger = logging.getLogger(__name__)
 
 FRAUD_RESPONSE_SCHEMA = {
     "type": "object",
@@ -49,43 +52,56 @@ class Default(WorkerEntrypoint):
             event_details = event.get("event", event)
             local_signals = derive_signals(event_details)
 
-            result = await self.env.AI.run(
-                MODEL,
-                {
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": (
-                                "You are a fraud investigation assistant. "
-                                "The application has already computed deterministic fraud signals. "
-                                "Use those signals as evidence when explaining risk and include "
-                                "each one verbatim in the response's signals array. "
-                                "Do not invent additional factual signals that are not supported by the event. "
-                                "You may identify patterns worth investigating, but clearly distinguish them "
-                                "from signals already detected by the system. "
-                                "Do not state that fraud has definitely occurred."
-                            ),
+            try:
+                result = await self.env.AI.run(
+                    MODEL,
+                    {
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": (
+                                    "You are a fraud investigation assistant. "
+                                    "The application has already computed deterministic fraud signals. "
+                                    "Use those signals as evidence when explaining risk and include "
+                                    "each one verbatim in the response's signals array. "
+                                    "Do not invent additional factual signals that are not supported by the event. "
+                                    "You may identify patterns worth investigating, but clearly distinguish them "
+                                    "from signals already detected by the system. "
+                                    "Do not state that fraud has definitely occurred."
+                                ),
+                            },
+                            {
+                                "role": "user",
+                                "content": (
+                                    "Analyze this event:\n\n"
+                                    + json.dumps(event, indent=2)
+                                    + "\n\nDeterministic fraud signals:\n"
+                                    + json.dumps(local_signals, indent=2)
+                                ),
+                            },
+                        ],
+                        "response_format": {
+                            "type": "json_schema",
+                            "json_schema": FRAUD_RESPONSE_SCHEMA,
                         },
-                        {
-                            "role": "user",
-                            "content": (
-                                "Analyze this event:\n\n"
-                                + json.dumps(event, indent=2)
-                                + "\n\nDeterministic fraud signals:\n"
-                                + json.dumps(local_signals, indent=2)
-                            ),
-                        },
-                    ],
-                    "response_format": {
-                        "type": "json_schema",
-                        "json_schema": FRAUD_RESPONSE_SCHEMA,
+                        "max_tokens": 500,
+                        "temperature": 0.2,
                     },
-                    "max_tokens": 500,
-                    "temperature": 0.2,
-                },
-            )
+                )
 
-            return Response.json(result.response)
+                return Response.json(result.response)
+            except Exception:
+                logger.exception("Workers AI fraud analysis failed")
+                return Response.json(
+                    {
+                        "error": (
+                            "Fraud analysis is temporarily unavailable. "
+                            "Please try again shortly."
+                        ),
+                        "code": "analysis_unavailable",
+                    },
+                    status=503,
+                )
 
         return Response.json(
             {"error": "Not found"},
