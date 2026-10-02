@@ -34,3 +34,15 @@
 ## Prompt 5
 
 > Let's create the assets directory as you mentioned, with the requisite files.
+
+## Prompt 6
+
+> Alright, we now have a basic harness set up. First, help me ensure that the AI agent we're having help detect fraud returns a neater, defined JSON response. The JSON response should return the following fields:
+>
+> risk: This should return one of "low", "medium", or "high".
+>
+> summary: A string containing the summary of the incident.
+>
+> signals: An array of strings listing which signals led us to believe this is fraud.
+>
+> recommended_actions: An array of strings containing recommended actions to take to resolve this fraud incident.
